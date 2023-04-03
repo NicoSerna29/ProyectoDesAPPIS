@@ -30,10 +30,69 @@ namespace Punto1.Controllers
         {
             return usuarios;
         }
-        [HttpGet("Consultar 2")]
-        public string Consultar2()
+        [HttpGet("Item")]
+        public Usuario Item(int CC)
         {
-            return "Hola Mundo 2";
+            return usuarios[CC];
+        }
+        [HttpGet("Detalle")]
+        public dynamic Detail(int CC)
+        {
+            //var hdr_key = Request.Headers["key_app"];
+            var hdr_key = Request.Headers.Where(x => x.Key.Equals("key_app")).FirstOrDefault();
+
+            if (hdr_key.Value.Count == 0)
+            {
+                return new
+                {
+                    code = "API ERROR",
+                    message = "NO ESTÁ AUTORIZADO",
+                    Detail = "N/A"
+
+                };
+            }
+            else
+            {
+                if (hdr_key.Value != "x1234") 
+                {
+                    return new
+                    {
+                        code = "API ERROR",
+                        message = "KEY INVALIDO",
+                        Detail = "N/A"
+
+                    };
+
+                }
+            }
+            var item = usuarios.Where(x => x.cc == CC).ToList();
+            if (item.Count > 0)
+            {
+
+                if (CC == 0 )
+                {
+                    return new
+                    {
+                        code = "OK",
+                        message = "USUARIO ENCONTRADO",
+                        Detail = "N/A"
+                    };
+                }
+                else
+                {
+                    return item;
+                }
+            }
+            else
+            {
+                return new
+                {
+                    code = "API COUNT",
+                    message = "NO EXISTEN USUARIOS REGISTRADOS CON ESE NUMERO DE DOCUMENTO",
+                    Detail = "N/A"
+                };
+            }
         }
     }
 }
+
